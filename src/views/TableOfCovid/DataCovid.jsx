@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./DataCovid.scss";
 import useFetch from "../../outsideModule/fetch";
 export default function DataCovid() {

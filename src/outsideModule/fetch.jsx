@@ -6,25 +6,31 @@ export default function useFetch(url) {
   const [isErr, setIsErr] = useState(false);
 
   useEffect(async () => {
+    const source = axios.CancelToken.source();
     async function fetchData() {
       try {
-        // setTimeout(async () => {
-        let res = await axios.get(url);
+        let res = await axios.get(url, { cancelToken: source.token });
         let locations =
           res && res.data && res.data.locations ? res.data.locations : [];
-        if (locations.length === 0) {
-          throw new Error("No data found");
-        }
         setDataCovid(locations);
         setIsLoading(false);
-        // }, 1000);
         setIsErr(false);
       } catch (e) {
-        setIsErr(true);
-        setIsLoading(false);
+        if (axios.isCancel(e)) {
+          console.log("Request đã được bãi bỏ", e.message);
+        } else {
+          setIsErr(true);
+          setIsLoading(false);
+          console.log("lỗi");
+        }
       }
     }
-    fetchData();
+    setTimeout(() => {
+      fetchData();
+    }, 1000);
+    return () => {
+      source.cancel();
+    };
   }, [url]);
   return { data, isLoading, isErr };
 }
